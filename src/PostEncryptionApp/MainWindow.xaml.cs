@@ -122,7 +122,6 @@ public partial class MainWindow : Window
             keyText == "请输入加密密钥..." || string.IsNullOrWhiteSpace(keyText))
         {
             ShowErrorAnimation(EncryptButton);
-            MessageBox.Show("请填写报文和密钥。", "输入错误", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -147,12 +146,10 @@ public partial class MainWindow : Window
             MessageTextBox.Foreground = new SolidColorBrush(Colors.White);
             
             ShowSuccessAnimation(EncryptButton);
-            MessageBox.Show("加密成功！", "操作完成", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             ShowErrorAnimation(EncryptButton);
-            MessageBox.Show("加密失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -166,7 +163,6 @@ public partial class MainWindow : Window
             keyText == "请输入加密密钥..." || string.IsNullOrWhiteSpace(keyText))
         {
             ShowErrorAnimation(DecryptButton);
-            MessageBox.Show("请填写报文和密钥。", "输入错误", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -176,7 +172,6 @@ public partial class MainWindow : Window
             if (allBytes.Length < 16)
             {
                 ShowErrorAnimation(DecryptButton);
-                MessageBox.Show("输入格式错误：密文过短。", "格式错误", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -197,22 +192,18 @@ public partial class MainWindow : Window
             MessageTextBox.Foreground = new SolidColorBrush(Colors.White);
             
             ShowSuccessAnimation(DecryptButton);
-            MessageBox.Show("解密成功！", "操作完成", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (FormatException)
         {
             ShowErrorAnimation(DecryptButton);
-            MessageBox.Show("输入不是有效的Base64文本。", "格式错误", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         catch (CryptographicException)
         {
             ShowErrorAnimation(DecryptButton);
-            MessageBox.Show("解密失败：密钥不正确或数据损坏。", "解密错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             ShowErrorAnimation(DecryptButton);
-            MessageBox.Show("解密失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
