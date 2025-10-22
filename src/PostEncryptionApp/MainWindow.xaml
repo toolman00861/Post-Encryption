@@ -1,0 +1,36 @@
+<Window x:Class="PostEncryptionApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="报文加密/解密服务" Height="420" Width="720">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="报文加密/解密服务" FontSize="20" FontWeight="Bold"/>
+
+        <TextBox x:Name="MessageTextBox"
+                 Grid.Row="1"
+                 Margin="0,12,0,0"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 TextWrapping="Wrap"
+                 Height="220"/>
+
+        <StackPanel Grid.Row="2" Margin="0,12,0,0" Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Text="密钥：" Width="50"/>
+            <TextBox x:Name="KeyTextBox" Width="300"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Margin="0,12,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="EncryptButton" Width="100" Margin="0,0,8,0" Content="加密" Click="EncryptButton_Click"/>
+            <Button x:Name="DecryptButton" Width="100" Content="解密" Click="DecryptButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
