@@ -4,33 +4,250 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="报文加密/解密服务" Height="420" Width="720">
-    <Grid Margin="16">
+        Title="报文加密/解密服务" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        MinHeight="500" MinWidth="700">
+    
+    <Window.Resources>
+        <!-- 现代化样式资源 -->
+        <Style x:Key="ModernCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF2D2D30"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="24"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" Direction="270" ShadowDepth="4" Opacity="0.3" BlurRadius="12"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#FF3E3E42"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#FF007ACC"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                        Margin="{TemplateBinding Padding}"
+                                        VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#FF00D4FF"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#FF00D4FF" Direction="0" ShadowDepth="0" Opacity="0.6" BlurRadius="8"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF007ACC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" Direction="270" ShadowDepth="2" Opacity="0.3" BlurRadius="6"/>
+                            </Border.Effect>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF1E8BC3"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#FF007ACC" Direction="0" ShadowDepth="0" Opacity="0.4" BlurRadius="12"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FF005A9E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+            <Setter Property="Background" Value="#FF6C757D"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" Direction="270" ShadowDepth="2" Opacity="0.3" BlurRadius="6"/>
+                            </Border.Effect>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF5A6268"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#FF6C757D" Direction="0" ShadowDepth="0" Opacity="0.4" BlurRadius="12"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FF495057"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TitleTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="Light"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+        </Style>
+
+        <Style x:Key="LabelTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="#FFE0E0E0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="#FF1E1E1E">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="报文加密/解密服务" FontSize="20" FontWeight="Bold"/>
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" Background="#FF252526" Padding="32,24">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Ellipse Width="12" Height="12" Fill="#FF007ACC" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="报文加密/解密服务" Style="{StaticResource TitleTextStyle}" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="🔐" FontSize="24" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="安全加密工具" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
 
-        <TextBox x:Name="MessageTextBox"
-                 Grid.Row="1"
-                 Margin="0,12,0,0"
-                 AcceptsReturn="True"
-                 VerticalScrollBarVisibility="Auto"
-                 TextWrapping="Wrap"
-                 Height="220"/>
+        <!-- 主内容区域 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="32">
+            <StackPanel>
+                <StackPanel.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="Margin" Value="0,0,0,24"/>
+                    </Style>
+                </StackPanel.Resources>
+                
+                <!-- 消息输入卡片 -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="📝 消息内容" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,16"/>
+                        <TextBox x:Name="MessageTextBox"
+                                 Style="{StaticResource ModernTextBoxStyle}"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap"
+                                 MinHeight="200"
+                                 MaxHeight="300"
+                                 Text="在此输入要加密或解密的消息内容..."/>
+                    </StackPanel>
+                </Border>
 
-        <StackPanel Grid.Row="2" Margin="0,12,0,0" Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Text="密钥：" Width="50"/>
-            <TextBox x:Name="KeyTextBox" Width="300"/>
-        </StackPanel>
+                <!-- 密钥输入卡片 -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="🔑 加密密钥" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,16"/>
+                        <TextBox x:Name="KeyTextBox"
+                                 Style="{StaticResource ModernTextBoxStyle}"
+                                 Text="请输入加密密钥..." Margin="0,0,0,16"/>
+                        <TextBlock Text="💡 提示：密钥将通过SHA256哈希处理以确保安全性" 
+                                   FontSize="12" 
+                                   Foreground="#FF888888" 
+                                   FontStyle="Italic"/>
+                    </StackPanel>
+                </Border>
 
-        <StackPanel Grid.Row="3" Margin="0,12,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="EncryptButton" Width="100" Margin="0,0,8,0" Content="加密" Click="EncryptButton_Click"/>
-            <Button x:Name="DecryptButton" Width="100" Content="解密" Click="DecryptButton_Click"/>
-        </StackPanel>
+                <!-- 操作按钮卡片 -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button x:Name="EncryptButton" 
+                                Grid.Column="0"
+                                Style="{StaticResource ModernButtonStyle}"
+                                Content="🔒 加密消息" 
+                                Click="EncryptButton_Click"
+                                Margin="0,0,12,0"/>
+                        
+                        <Button x:Name="DecryptButton" 
+                                Grid.Column="1"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Content="🔓 解密消息" 
+                                Click="DecryptButton_Click"
+                                Margin="12,0,0,0"/>
+                    </Grid>
+                </Border>
+
+                <!-- 状态信息卡片 -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="ℹ️ 使用说明" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,12"/>
+                        <TextBlock TextWrapping="Wrap" 
+                                   FontSize="13" 
+                                   Foreground="#FFCCCCCC" 
+                                   LineHeight="20">
+                            <Run Text="• 加密：输入明文消息和密钥，点击&quot;加密消息&quot;按钮"/>
+                            <LineBreak/>
+                            <Run Text="• 解密：输入Base64编码的密文和相同的密钥，点击&quot;解密消息&quot;按钮"/>
+                            <LineBreak/>
+                            <Run Text="• 算法：使用AES-256-CBC加密算法，确保数据安全"/>
+                            <LineBreak/>
+                            <Run Text="• 安全：密钥通过SHA256哈希处理，每次加密使用随机IV"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

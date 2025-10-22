@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Media.Animation;
 
 namespace PostEncryptionApp;
 
@@ -21,15 +22,107 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        InitializeUI();
+    }
+
+    private void InitializeUI()
+    {
+        // 清空占位符文本当获得焦点时
+        MessageTextBox.GotFocus += (s, e) =>
+        {
+            if (MessageTextBox.Text == "在此输入要加密或解密的消息内容...")
+            {
+                MessageTextBox.Text = "";
+                MessageTextBox.Foreground = new SolidColorBrush(Colors.White);
+            }
+        };
+
+        MessageTextBox.LostFocus += (s, e) =>
+        {
+            if (string.IsNullOrWhiteSpace(MessageTextBox.Text))
+            {
+                MessageTextBox.Text = "在此输入要加密或解密的消息内容...";
+                MessageTextBox.Foreground = new SolidColorBrush(Color.FromRgb(136, 136, 136));
+            }
+        };
+
+        KeyTextBox.GotFocus += (s, e) =>
+        {
+            if (KeyTextBox.Text == "请输入加密密钥...")
+            {
+                KeyTextBox.Text = "";
+                KeyTextBox.Foreground = new SolidColorBrush(Colors.White);
+            }
+        };
+
+        KeyTextBox.LostFocus += (s, e) =>
+        {
+            if (string.IsNullOrWhiteSpace(KeyTextBox.Text))
+            {
+                KeyTextBox.Text = "请输入加密密钥...";
+                KeyTextBox.Foreground = new SolidColorBrush(Color.FromRgb(136, 136, 136));
+            }
+        };
+
+        // 设置初始占位符颜色
+        MessageTextBox.Foreground = new SolidColorBrush(Color.FromRgb(136, 136, 136));
+        KeyTextBox.Foreground = new SolidColorBrush(Color.FromRgb(136, 136, 136));
+    }
+
+    private void ShowSuccessAnimation(Button button)
+    {
+        var originalBackground = button.Background;
+        var successBrush = new SolidColorBrush(Color.FromRgb(40, 167, 69));
+        
+        var colorAnimation = new ColorAnimation
+        {
+            To = Color.FromRgb(40, 167, 69),
+            Duration = TimeSpan.FromMilliseconds(200),
+            AutoReverse = true,
+            RepeatBehavior = new RepeatBehavior(1)
+        };
+
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(colorAnimation);
+        Storyboard.SetTarget(colorAnimation, button);
+        Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("Background.Color"));
+        
+        storyboard.Completed += (s, e) => button.Background = originalBackground;
+        storyboard.Begin();
+    }
+
+    private void ShowErrorAnimation(Button button)
+    {
+        var originalBackground = button.Background;
+        
+        var colorAnimation = new ColorAnimation
+        {
+            To = Color.FromRgb(220, 53, 69),
+            Duration = TimeSpan.FromMilliseconds(200),
+            AutoReverse = true,
+            RepeatBehavior = new RepeatBehavior(1)
+        };
+
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(colorAnimation);
+        Storyboard.SetTarget(colorAnimation, button);
+        Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("Background.Color"));
+        
+        storyboard.Completed += (s, e) => button.Background = originalBackground;
+        storyboard.Begin();
     }
 
     private void EncryptButton_Click(object sender, RoutedEventArgs e)
     {
         var plaintext = MessageTextBox.Text ?? string.Empty;
         var keyText = KeyTextBox.Text ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(plaintext) || string.IsNullOrWhiteSpace(keyText))
+        
+        // 检查是否为占位符文本
+        if (plaintext == "在此输入要加密或解密的消息内容..." || string.IsNullOrWhiteSpace(plaintext) ||
+            keyText == "请输入加密密钥..." || string.IsNullOrWhiteSpace(keyText))
         {
-            MessageBox.Show("请填写报文和密钥。");
+            ShowErrorAnimation(EncryptButton);
+            MessageBox.Show("请填写报文和密钥。", "输入错误", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -51,10 +144,15 @@ public partial class MainWindow : Window
             Buffer.BlockCopy(cipherBytes, 0, output, aes.IV.Length, cipherBytes.Length);
 
             MessageTextBox.Text = Convert.ToBase64String(output);
+            MessageTextBox.Foreground = new SolidColorBrush(Colors.White);
+            
+            ShowSuccessAnimation(EncryptButton);
+            MessageBox.Show("加密成功！", "操作完成", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            MessageBox.Show("加密失败：" + ex.Message);
+            ShowErrorAnimation(EncryptButton);
+            MessageBox.Show("加密失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -62,9 +160,13 @@ public partial class MainWindow : Window
     {
         var input = MessageTextBox.Text ?? string.Empty;
         var keyText = KeyTextBox.Text ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(keyText))
+        
+        // 检查是否为占位符文本
+        if (input == "在此输入要加密或解密的消息内容..." || string.IsNullOrWhiteSpace(input) ||
+            keyText == "请输入加密密钥..." || string.IsNullOrWhiteSpace(keyText))
         {
-            MessageBox.Show("请填写报文和密钥。");
+            ShowErrorAnimation(DecryptButton);
+            MessageBox.Show("请填写报文和密钥。", "输入错误", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -73,7 +175,8 @@ public partial class MainWindow : Window
             var allBytes = Convert.FromBase64String(input);
             if (allBytes.Length < 16)
             {
-                MessageBox.Show("输入格式错误：密文过短。");
+                ShowErrorAnimation(DecryptButton);
+                MessageBox.Show("输入格式错误：密文过短。", "格式错误", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -91,18 +194,25 @@ public partial class MainWindow : Window
             using var decryptor = aes.CreateDecryptor(aes.Key, iv);
             var plainBytes = decryptor.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
             MessageTextBox.Text = Encoding.UTF8.GetString(plainBytes);
+            MessageTextBox.Foreground = new SolidColorBrush(Colors.White);
+            
+            ShowSuccessAnimation(DecryptButton);
+            MessageBox.Show("解密成功！", "操作完成", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (FormatException)
         {
-            MessageBox.Show("输入不是有效的Base64文本。");
+            ShowErrorAnimation(DecryptButton);
+            MessageBox.Show("输入不是有效的Base64文本。", "格式错误", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         catch (CryptographicException)
         {
-            MessageBox.Show("解密失败：密钥不正确或数据损坏。");
+            ShowErrorAnimation(DecryptButton);
+            MessageBox.Show("解密失败：密钥不正确或数据损坏。", "解密错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch (Exception ex)
         {
-            MessageBox.Show("解密失败：" + ex.Message);
+            ShowErrorAnimation(DecryptButton);
+            MessageBox.Show("解密失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
