@@ -175,8 +175,29 @@
                     </Style>
                 </StackPanel.Resources>
                 
-                <!-- 消息输入卡片 -->
+                <!-- 加密模式选择卡片 -->
                 <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="🔧 加密模式" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,16"/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="TextModeRadio" 
+                                         Content="文本加密" 
+                                         IsChecked="True"
+                                         Foreground="White"
+                                         FontSize="14"
+                                         Margin="0,0,24,0"
+                                         Checked="ModeRadio_Checked"/>
+                            <RadioButton x:Name="FileModeRadio" 
+                                         Content="文件加密" 
+                                         Foreground="White"
+                                         FontSize="14"
+                                         Checked="ModeRadio_Checked"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 消息输入卡片 -->
+                <Border x:Name="TextInputCard" Style="{StaticResource ModernCardStyle}">
                     <StackPanel>
                         <TextBlock Text="📝 消息内容" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,16"/>
                         <TextBox x:Name="MessageTextBox"
@@ -187,6 +208,57 @@
                                  MinHeight="200"
                                  MaxHeight="300"
                                  Text="在此输入要加密或解密的消息内容..."/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 文件选择卡片 -->
+                <Border x:Name="FileInputCard" Style="{StaticResource ModernCardStyle}" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="📁 文件选择" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,16"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBox x:Name="FilePathTextBox"
+                                     Grid.Column="0"
+                                     Style="{StaticResource ModernTextBoxStyle}"
+                                     IsReadOnly="True"
+                                     Text="请选择要加密的文件..."
+                                     Margin="0,0,12,0"/>
+                            
+                            <Button x:Name="SelectFileButton"
+                                    Grid.Column="1"
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Content="📂 选择文件"
+                                    Click="SelectFileButton_Click"
+                                    MinWidth="120"/>
+                        </Grid>
+                        
+                        <StackPanel x:Name="FileInfoPanel" Margin="0,16,0,0" Visibility="Collapsed">
+                            <TextBlock Text="📊 文件信息" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,8"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="文件名：" Foreground="#FFCCCCCC" FontSize="12" Margin="0,0,8,4"/>
+                                <TextBlock x:Name="FileNameText" Grid.Row="0" Grid.Column="1" Foreground="White" FontSize="12" Margin="0,0,0,4"/>
+                                
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="文件大小：" Foreground="#FFCCCCCC" FontSize="12" Margin="0,0,8,4"/>
+                                <TextBlock x:Name="FileSizeText" Grid.Row="1" Grid.Column="1" Foreground="White" FontSize="12" Margin="0,0,0,4"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="文件类型：" Foreground="#FFCCCCCC" FontSize="12" Margin="0,0,8,0"/>
+                                <TextBlock x:Name="FileTypeText" Grid.Row="2" Grid.Column="1" Foreground="White" FontSize="12"/>
+                            </Grid>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
@@ -215,17 +287,44 @@
                         <Button x:Name="EncryptButton" 
                                 Grid.Column="0"
                                 Style="{StaticResource ModernButtonStyle}"
-                                Content="🔒 加密消息" 
+                                Content="🔒 加密" 
                                 Click="EncryptButton_Click"
                                 Margin="0,0,12,0"/>
                         
                         <Button x:Name="DecryptButton" 
                                 Grid.Column="1"
                                 Style="{StaticResource SecondaryButtonStyle}"
-                                Content="🔓 解密消息" 
+                                Content="🔓 解密" 
                                 Click="DecryptButton_Click"
                                 Margin="12,0,0,0"/>
                     </Grid>
+                </Border>
+
+                <!-- 文件保存选项卡片 -->
+                <Border x:Name="FileSaveCard" Style="{StaticResource ModernCardStyle}" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="💾 保存选项" Style="{StaticResource LabelTextStyle}" Margin="0,0,0,16"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBox x:Name="SavePathTextBox"
+                                     Grid.Column="0"
+                                     Style="{StaticResource ModernTextBoxStyle}"
+                                     IsReadOnly="True"
+                                     Text="选择保存位置..."
+                                     Margin="0,0,12,0"/>
+                            
+                            <Button x:Name="SelectSavePathButton"
+                                    Grid.Column="1"
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Content="📁 选择位置"
+                                    Click="SelectSavePathButton_Click"
+                                    MinWidth="120"/>
+                        </Grid>
+                    </StackPanel>
                 </Border>
 
                 <!-- 状态信息卡片 -->
@@ -236,13 +335,21 @@
                                    FontSize="13" 
                                    Foreground="#FFCCCCCC" 
                                    LineHeight="20">
-                            <Run Text="• 加密：输入明文消息和密钥，点击&quot;加密消息&quot;按钮"/>
+                            <Run Text="• 文本模式：输入明文消息和密钥，点击&quot;加密&quot;按钮进行文本加密"/>
                             <LineBreak/>
-                            <Run Text="• 解密：输入Base64编码的密文和相同的密钥，点击&quot;解密消息&quot;按钮"/>
+                            <Run Text="• 文件模式：选择图片、视频等文件和密钥，点击&quot;加密&quot;按钮进行文件加密"/>
+                            <LineBreak/>
+                            <Run Text="• 解密：输入Base64编码的密文（或选择加密文件）和相同的密钥，点击&quot;解密&quot;按钮"/>
                             <LineBreak/>
                             <Run Text="• 算法：使用AES-256-CBC加密算法，确保数据安全"/>
                             <LineBreak/>
                             <Run Text="• 安全：密钥通过SHA256哈希处理，每次加密使用随机IV"/>
+                            <LineBreak/>
+                            <Run Text="• 支持格式：支持所有类型的文件，包括图片(jpg, png, gif)、视频(mp4, avi, mov)等"/>
+                            <LineBreak/>
+                            <Run Text="• 文件限制：单个文件最大支持100MB，确保加密性能"/>
+                            <LineBreak/>
+                            <Run Text="• 操作提示：文件模式下需要选择输入文件和输出保存位置"/>
                         </TextBlock>
                     </StackPanel>
                 </Border>
